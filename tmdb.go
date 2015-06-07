@@ -1,11 +1,15 @@
 package main
 
 import(
-      "fmt"
       "net/http"
       "encoding/json"
       "errors"
+      "log"
+      "strconv"
       )
+
+const TMDB_KEY = "YOUR_TMDB_API_KEY_HERE"
+const BASE_URL = "https://api.themoviedb.org/3/"
 
 type Result struct {
   Id int `json:"id"`
@@ -16,58 +20,85 @@ type Search struct {
   TotalResults int `json:"total_results"`
 }
 
-func tmdb(){
-  base_url := "https://api.themoviedb.org/3/"
-  search_movie(base_url)
+type Movie struct {
+  IMDB_ID string `json:"imdb_id"`
+  Rating float64 `json:"vote_average"`
+  Name string `json:"original_title"`
 }
 
-func search_movie(base_url string) {
+func tmdb(fin_out *Fin_JSON) (imdbid string, err error){
+  movie_id, err := search_movie()
+  if err != nil {
+    log.Fatal(err)
+    return "", err
+  }
+  movie, err := get_movie(movie_id)
 
+  if err != nil {
+    log.Fatal(err)
+    return "", err
+  }
+
+  fin_out.Title = movie.Name
+  fin_out.Ratings["tmdb"] = movie.Rating
+  return movie.IMDB_ID, nil
+}
+
+func search_movie() (movie_id int, err error){
   var r Search
+  url :=  BASE_URL + "search/movie?api_key=" + TMDB_KEY + "&query=fight"
 
-  search_url := base_url + "search/movie?api_key=" + TMDB_KEY + "&query=fight"
-
-  out, err := call_api(r, search_url)
-
-  if err != nil {
-    fmt.Println(err)
-  } else {
-    fmt.Println(out.Id)
-  }
-}
-
-
-func call_api(r Search, url string) (out Result, err error) {
-  var emp_struct Result
-  client := &http.Client{}
-
-  req, err := http.NewRequest("GET", url, nil)
+  out := call_api(url)
+  err = json.NewDecoder(out.Body).Decode(&r)
 
   if err != nil {
-    fmt.Println("Something wrong with the URL" + url)
-    return emp_struct, err
-  }
-  req.Header.Set("Accept", "application/json")
-
-  resp, err := client.Do(req)
-  if err != nil {
-    fmt.Println("Something wrong while fetching the data")
-    return emp_struct, err
-  }
-
-  defer resp.Body.Close()
-
-  err = json.NewDecoder(resp.Body).Decode(&r)
-
-  if err != nil {
-    fmt.Println("Somthing went wrong while unmarshalling the data")
-    return emp_struct, err
+    log.Fatal("Somthing went wrong while unmarshalling the data")
+    return 0, err
   }
 
   if r.TotalResults < 1 {
     err := errors.New("ERROR: Movie Name not found")
-    return emp_struct, err
+    return 0, err
   } else {
-    return r.Results[0], nil
+    return r.Results[0].Id, nil
   }
 }
+
+func get_movie(id int) (mov Movie, err error) {
+  var m Movie
+
+  url := BASE_URL + "movie/" + strconv.Itoa(id) + "?api_key=" + TMDB_KEY
+  out := call_api(url)
+
+  err = json.NewDecoder(out.Body).Decode(&m)
+
+  if err != nil {
+    log.Fatal("Somthing went wrong while unmarshalling the data")
+    return m, err
+  }
+
+  return m, nil
+
+}
+
+
+func call_api(url string) *http.Response {
+  client := &http.Client{}
+  req, err := http.NewRequest("GET", url, nil)
+
+  if err != nil {
+    log.Fatal("Something wrong with the URL" + url)
+  }
+
+  req.Header.Set("Accept", "application/json")
+
+  resp, err := client.Do(req)
+
+  if err != nil {
+    log.Fatal("Something wrong while fetching the data")
+    log.Fatal(err)
+  }
+
+  return resp
+}
+
