@@ -8,8 +8,8 @@ import(
       "strconv"
       )
 
-const TMDB_KEY = "YOUR_TMDB_API_KEY_HERE"
-const BASE_URL = "https://api.themoviedb.org/3/"
+const TMDB_KEY = "5450d19ab0d8917dfc1389aef4b27098"
+const TMDB_URL = "https://api.themoviedb.org/3/"
 
 type Result struct {
   Id int `json:"id"`
@@ -46,13 +46,13 @@ func tmdb(fin_out *Fin_JSON) (imdbid string, err error){
 
 func search_movie() (movie_id int, err error){
   var r Search
-  url :=  BASE_URL + "search/movie?api_key=" + TMDB_KEY + "&query=fight"
+  url :=  TMDB_URL + "search/movie?api_key=" + TMDB_KEY + "&query=fight"
 
   out := call_api(url)
   err = json.NewDecoder(out.Body).Decode(&r)
 
   if err != nil {
-    log.Fatal("Somthing went wrong while unmarshalling the data")
+    log.Fatal("Somthing went wrong while unmarshalling the data - TMDB")
     return 0, err
   }
 
@@ -67,7 +67,7 @@ func search_movie() (movie_id int, err error){
 func get_movie(id int) (mov Movie, err error) {
   var m Movie
 
-  url := BASE_URL + "movie/" + strconv.Itoa(id) + "?api_key=" + TMDB_KEY
+  url := TMDB_URL + "movie/" + strconv.Itoa(id) + "?api_key=" + TMDB_KEY
   out := call_api(url)
 
   err = json.NewDecoder(out.Body).Decode(&m)

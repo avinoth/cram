@@ -23,6 +23,8 @@ func main() {
     log.Fatal("Something wrong with TMDB.")
   }
 
+  imdb(imdb_id, &Output)
+
   json_out, _ := json.Marshal(&Output)
   fmt.Println(imdb_id)
   fmt.Println(string(json_out))
