@@ -9,13 +9,13 @@ import (
 
 type Fin_JSON struct {
   Title string
-  Ratings map[string]float64
+  Ratings map[string]string
 }
 
 func main() {
   Output := Fin_JSON{
     Title: "",
-    Ratings: make(map[string]float64),
+    Ratings: make(map[string]string),
   }
 
   imdb_id, err := tmdb(&Output)

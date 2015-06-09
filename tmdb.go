@@ -8,7 +8,7 @@ import(
       "strconv"
       )
 
-const TMDB_KEY = "5450d19ab0d8917dfc1389aef4b27098"
+const TMDB_KEY = "YOUR_TMDB_API_KEY_HERE"
 const TMDB_URL = "https://api.themoviedb.org/3/"
 
 type Result struct {
@@ -40,7 +40,7 @@ func tmdb(fin_out *Fin_JSON) (imdbid string, err error){
   }
 
   fin_out.Title = movie.Name
-  fin_out.Ratings["tmdb"] = movie.Rating
+  fin_out.Ratings["tmdb"] = strconv.FormatFloat(movie.Rating, 'f', 2, 64)
   return movie.IMDB_ID, nil
 }
 
@@ -73,7 +73,8 @@ func get_movie(id int) (mov Movie, err error) {
   err = json.NewDecoder(out.Body).Decode(&m)
 
   if err != nil {
-    log.Fatal("Somthing went wrong while unmarshalling the data")
+    log.Fatal(err)
+    log.Fatal("Something went wrong while unmarshalling the data - TMDB")
     return m, err
   }
 
