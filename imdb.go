@@ -8,12 +8,12 @@ import(
 const IMDB_URL = "http://www.omdbapi.com"
 
 type IMDB_MOVIE struct {
-  TomatoRating string
   ImdbRating string
+  TomatoRating string
   TomatoMeter string
 }
 
-func imdb(id string, fin_out *Fin_JSON) {
+func imdb(id string, final_resp *Final) {
   var m IMDB_MOVIE
 
   url := IMDB_URL + "/?i=" + id + "&tomatoes=true"
@@ -23,10 +23,10 @@ func imdb(id string, fin_out *Fin_JSON) {
   err := json.NewDecoder(out.Body).Decode(&m)
 
   if err != nil {
-    log.Fatal("Somthing went wrong while unmarshalling the data - IMDB")
+    log.Fatal("IMDB - Somthing went wrong while unmarshalling the data: " + err.Error())
   }
 
-  fin_out.Ratings["rotten_tomatoes_rating"] = m.TomatoRating
-  fin_out.Ratings["imdb"] = m.ImdbRating
-  fin_out.Ratings["rotten_tomatoes_meter"] = m.TomatoMeter
+  final_resp.Ratings["imdb"] = m.ImdbRating
+  final_resp.Ratings["rotten_tomatoes"] = m.TomatoRating
+  final_resp.Ratings["rotten_tomatoes_meter"] = m.TomatoMeter
 }

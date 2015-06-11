@@ -9,7 +9,7 @@ import(
       )
 
 const TMDB_KEY = "YOUR_TMDB_API_KEY_HERE"
-const TMDB_URL = "https://api.themoviedb.org/3/"
+const TMDB_URL = "https://api.themoviedb.org/3"
 
 type Result struct {
   Id int `json:"id"`
@@ -26,34 +26,34 @@ type Movie struct {
   Name string `json:"original_title"`
 }
 
-func tmdb(fin_out *Fin_JSON) (imdbid string, err error){
+func tmdb(final_resp *Final) (string, error){
   movie_id, err := search_movie()
+
   if err != nil {
-    log.Fatal(err)
-    return "", err
+    log.Fatal("TMDB - Error Searching for movie: " + err.Error())
   }
+
+
   movie, err := get_movie(movie_id)
 
   if err != nil {
-    log.Fatal(err)
-    return "", err
+    log.Fatal("TMDB - Error Fetching the Movie: " + err.Error())
   }
 
-  fin_out.Title = movie.Name
-  fin_out.Ratings["tmdb"] = strconv.FormatFloat(movie.Rating, 'f', 2, 64)
+  final_resp.Title = movie.Name
+  final_resp.Ratings["tmdb"] = strconv.FormatFloat(movie.Rating, 'f', 2, 64)
   return movie.IMDB_ID, nil
 }
 
-func search_movie() (movie_id int, err error){
+func search_movie() (int, error){
   var r Search
-  url :=  TMDB_URL + "search/movie?api_key=" + TMDB_KEY + "&query=fight"
+  url :=  TMDB_URL + "/search/movie?api_key=" + TMDB_KEY + "&query=fight+club"
 
   out := call_api(url)
-  err = json.NewDecoder(out.Body).Decode(&r)
+  err := json.NewDecoder(out.Body).Decode(&r)
 
   if err != nil {
-    log.Fatal("Somthing went wrong while unmarshalling the data - TMDB")
-    return 0, err
+    log.Fatal("TMDB - Something went wrong while unmarshalling the data: " + err.Error())
   }
 
   if r.TotalResults < 1 {
@@ -64,18 +64,16 @@ func search_movie() (movie_id int, err error){
   }
 }
 
-func get_movie(id int) (mov Movie, err error) {
+func get_movie(id int) (Movie, error) {
   var m Movie
 
-  url := TMDB_URL + "movie/" + strconv.Itoa(id) + "?api_key=" + TMDB_KEY
+  url := TMDB_URL + "/movie/" + strconv.Itoa(id) + "?api_key=" + TMDB_KEY
   out := call_api(url)
 
-  err = json.NewDecoder(out.Body).Decode(&m)
+  err := json.NewDecoder(out.Body).Decode(&m)
 
   if err != nil {
-    log.Fatal(err)
-    log.Fatal("Something went wrong while unmarshalling the data - TMDB")
-    return m, err
+    log.Fatal("TMDB - Something went wrong while unmarshalling the data: " + err.Error())
   }
 
   return m, nil
@@ -88,7 +86,7 @@ func call_api(url string) *http.Response {
   req, err := http.NewRequest("GET", url, nil)
 
   if err != nil {
-    log.Fatal("Something wrong with the URL" + url)
+    log.Fatal("Something wrong with the URL: " + url + " - " + err.Error())
   }
 
   req.Header.Set("Accept", "application/json")
@@ -96,8 +94,7 @@ func call_api(url string) *http.Response {
   resp, err := client.Do(req)
 
   if err != nil {
-    log.Fatal("Something wrong while fetching the data")
-    log.Fatal(err)
+    log.Fatal("Something went wrong while fetching the data: " + err.Error())
   }
 
   return resp

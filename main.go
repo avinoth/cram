@@ -7,13 +7,13 @@ import (
         "encoding/json"
         )
 
-type Fin_JSON struct {
+type Final struct {
   Title string
   Ratings map[string]string
 }
 
 func main() {
-  Output := Fin_JSON{
+  Output := Final{
     Title: "",
     Ratings: make(map[string]string),
   }
@@ -24,8 +24,8 @@ func main() {
   }
 
   imdb(imdb_id, &Output)
+  metacritic(&Output)
 
   json_out, _ := json.Marshal(&Output)
-  fmt.Println(imdb_id)
   fmt.Println(string(json_out))
 }
