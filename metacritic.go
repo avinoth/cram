@@ -23,19 +23,10 @@ func metacritic(final_resp *Final) {
     log.Fatal("Something went wrong while parsing Metaacritic: " + err.Error())
   }
 
-  // name := page.Find("#main .movie_content_head .product_title a span").First().Text()
-
-  // name = strings.Replace(name, " ", "-", -1)
-
-  // fmt.Println(name)
-  // if name != title {
-  //   log.Fatal("Unable to fetch the movie " + title + " from metacritic..")
-  // }
-
   metascore := page.Find(".product_scores .metascore_summary a span").First().Text()
   user_score := page.Find(".product_scores .side_details .score_summary a div").First().Text()
 
-  final_resp.Ratings["metacritic_metascore"] = metascore
-  final_resp.Ratings["metacritic_userscore"] = user_score
+  final_resp.Ratings["critic"]["metacritic_metascore"] = metascore
+  final_resp.Ratings["user"]["metacritic_userscore"] = user_score
 
 }

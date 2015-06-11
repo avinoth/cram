@@ -9,13 +9,16 @@ import (
 
 type Final struct {
   Title string
-  Ratings map[string]string
+  Ratings map[string]map[string]string
 }
 
 func main() {
   Output := Final{
     Title: "",
-    Ratings: make(map[string]string),
+    Ratings: map[string]map[string]string{
+      "user": make(map[string]string),
+      "critic": make(map[string]string),
+    },
   }
 
   imdb_id, err := tmdb(&Output)

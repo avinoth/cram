@@ -26,7 +26,7 @@ func imdb(id string, final_resp *Final) {
     log.Fatal("IMDB - Somthing went wrong while unmarshalling the data: " + err.Error())
   }
 
-  final_resp.Ratings["imdb"] = m.ImdbRating
-  final_resp.Ratings["rotten_tomatoes"] = m.TomatoRating
-  final_resp.Ratings["rotten_tomatoes_meter"] = m.TomatoMeter
+  final_resp.Ratings["user"]["imdb"] = m.ImdbRating
+  final_resp.Ratings["user"]["rotten_tomatoes"] = m.TomatoRating
+  final_resp.Ratings["critic"]["rotten_tomatoes_meter"] = m.TomatoMeter
 }

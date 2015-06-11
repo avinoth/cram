@@ -1,7 +1,6 @@
 package main
 
 import(
-      "net/http"
       "encoding/json"
       "errors"
       "log"
@@ -41,7 +40,7 @@ func tmdb(final_resp *Final) (string, error){
   }
 
   final_resp.Title = movie.Name
-  final_resp.Ratings["tmdb"] = strconv.FormatFloat(movie.Rating, 'f', 2, 64)
+  final_resp.Ratings["user"]["tmdb"] = strconv.FormatFloat(movie.Rating, 'f', 2, 64)
   return movie.IMDB_ID, nil
 }
 
@@ -79,24 +78,3 @@ func get_movie(id int) (Movie, error) {
   return m, nil
 
 }
-
-
-func call_api(url string) *http.Response {
-  client := &http.Client{}
-  req, err := http.NewRequest("GET", url, nil)
-
-  if err != nil {
-    log.Fatal("Something wrong with the URL: " + url + " - " + err.Error())
-  }
-
-  req.Header.Set("Accept", "application/json")
-
-  resp, err := client.Do(req)
-
-  if err != nil {
-    log.Fatal("Something went wrong while fetching the data: " + err.Error())
-  }
-
-  return resp
-}
-
