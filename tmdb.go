@@ -25,15 +25,14 @@ type Movie struct {
   Name string `json:"original_title"`
 }
 
-func tmdb(final_resp *Final) (string, error){
+func tmdb(final_resp *Final) (string){
   movie_id, err := search_movie()
 
   if err != nil {
     log.Fatal("TMDB - Error Searching for movie: " + err.Error())
   }
 
-
-  movie, err := get_movie(movie_id)
+  movie := get_movie(movie_id)
 
   if err != nil {
     log.Fatal("TMDB - Error Fetching the Movie: " + err.Error())
@@ -41,7 +40,7 @@ func tmdb(final_resp *Final) (string, error){
 
   final_resp.Title = movie.Name
   final_resp.Ratings["user"]["tmdb"] = strconv.FormatFloat(movie.Rating, 'f', 2, 64)
-  return movie.IMDB_ID, nil
+  return movie.IMDB_ID
 }
 
 func search_movie() (int, error){
@@ -63,7 +62,7 @@ func search_movie() (int, error){
   }
 }
 
-func get_movie(id int) (Movie, error) {
+func get_movie(id int) (Movie) {
   var m Movie
 
   url := TMDB_URL + "/movie/" + strconv.Itoa(id) + "?api_key=" + TMDB_KEY
@@ -75,6 +74,6 @@ func get_movie(id int) (Movie, error) {
     log.Fatal("TMDB - Something went wrong while unmarshalling the data: " + err.Error())
   }
 
-  return m, nil
+  return m
 
 }

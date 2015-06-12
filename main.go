@@ -21,10 +21,7 @@ func main() {
     },
   }
 
-  imdb_id, err := tmdb(&Output)
-  if err != nil {
-    log.Fatal("Something wrong with TMDB.")
-  }
+  imdb_id := tmdb(&Output)
 
   imdb(imdb_id, &Output)
   metacritic(&Output)
