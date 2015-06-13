@@ -25,8 +25,8 @@ type Movie struct {
   Name string `json:"original_title"`
 }
 
-func tmdb(final_resp *Final) (string){
-  movie_id, err := search_movie()
+func tmdb(name string, final_resp *Final) (string){
+  movie_id, err := search_movie(name)
 
   if err != nil {
     log.Fatal("TMDB - Error Searching for movie: " + err.Error())
@@ -43,9 +43,9 @@ func tmdb(final_resp *Final) (string){
   return movie.IMDB_ID
 }
 
-func search_movie() (int, error){
+func search_movie(name string) (int, error){
   var r Search
-  url :=  TMDB_URL + "/search/movie?api_key=" + TMDB_KEY + "&query=fight+club"
+  url :=  TMDB_URL + "/search/movie?api_key=" + TMDB_KEY + "&query=" + name
 
   out := call_api(url)
   err := json.NewDecoder(out.Body).Decode(&r)
