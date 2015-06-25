@@ -1,12 +1,10 @@
-package main
+package cram
 
 
 import (
-        "log"
         "encoding/json"
         "net/http"
-
-         "github.com/gorilla/mux"
+        "fmt"
         )
 
 type Final struct {
@@ -14,12 +12,8 @@ type Final struct {
   Ratings map[string]map[string]string
 }
 
-func main() {
-  router := mux.NewRouter()
-
-  router.HandleFunc("/api/movies/{movieName}", GetRatings)
-
-  log.Fatal(http.ListenAndServe(":8080", router))
+func init() {
+  http.HandleFunc("/", GetRatings)
 }
 
 func GetRatings(w http.ResponseWriter, r *http.Request) {
@@ -31,13 +25,20 @@ func GetRatings(w http.ResponseWriter, r *http.Request) {
     },
   }
 
-  vars := mux.Vars(r)
-  name := vars["movieName"]
+  name := r.URL.Path[1:]
 
   imdb_id := tmdb(name, &Output)
 
   imdb(imdb_id, &Output)
   metacritic(&Output)
 
-  json.NewEncoder(w).Encode(&Output)
+  w.Header().Set("Application-Type", "Application/json")
+  res, err := json.Marshal(Output)
+  fmt.Println(res)
+  if err != nil {
+    http.Error(w, err.Error(), http.StatusInternalServerError)
+    return
+  }
+
+  fmt.Fprint(w, string(res))
 }

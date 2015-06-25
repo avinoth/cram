@@ -1,4 +1,4 @@
-package main
+package cram
 
 import(
       "encoding/json"
@@ -7,7 +7,7 @@ import(
       "strconv"
       )
 
-const TMDB_KEY = "YOUR_TMDB_API_KEY_HERE"
+const TMDB_KEY = "5450d19ab0d8917dfc1389aef4b27098"
 const TMDB_URL = "https://api.themoviedb.org/3"
 
 type Result struct {
